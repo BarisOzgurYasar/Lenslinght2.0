@@ -73,6 +73,10 @@ const createToken = (userId) => {
 
 const getDashboardPage = async (req, res) => {
   const photos = await Photo.find({ user: res.locals.user._id });
+  const user = await User.findById({ _id: res.locals.user._id }).populate([
+    'followings',
+    'followers',
+  ]);
   res.render('dashboard', {
     link: 'dashboard',
     photos,
@@ -96,10 +100,8 @@ const getAllUsers = async (req, res) => {
 
 const getAUser = async (req, res) => {
   try {
-    const user = await User.findById({
-      _id: req.params.id,
-    });
-    const photos = await Photo.find({ user: res.locals.user._id });
+    const user = await User.findById({ _id: req.params.id });
+    const photos = await Photo.find({ user: user._id });
     res.status(200).render('user', {
       user,
       photos,
@@ -113,4 +115,64 @@ const getAUser = async (req, res) => {
   }
 };
 
-export { createUser, loginUser, getDashboardPage, getAllUsers, getAUser };
+const follow = async (req, res) => {
+  try {
+    let user = await User.findByIdAndUpdate(
+      { _id: req.params.id },
+      { $push: { followers: res.locals._id } },
+      { new: true }
+    );
+
+    user = await User.findByIdAndUpdate(
+      { _id: req.locals._id },
+      { $push: { followings: res.params.id } },
+      { new: true }
+    );
+
+    res.status(200).json({
+      succeded: true,
+      user,
+    });
+  } catch (error) {
+    res.status(500).json({
+      succeded: false,
+      error,
+    });
+  }
+};
+
+const unfollow = async (req, res) => {
+  try {
+    let user = await User.findByIdAndUpdate(
+      { _id: req.params.id },
+      { $pull: { followers: res.locals._id } },
+      { new: true }
+    );
+
+    user = await User.findByIdAndUpdate(
+      { _id: req.locals._id },
+      { $pull: { followings: res.params.id } },
+      { new: true }
+    );
+
+    res.status(200).json({
+      succeded: true,
+      user,
+    });
+  } catch (error) {
+    res.status(500).json({
+      succeded: false,
+      error,
+    });
+  }
+};
+
+export {
+  createUser,
+  loginUser,
+  getDashboardPage,
+  getAllUsers,
+  getAUser,
+  follow,
+  unfollow,
+};

@@ -32,7 +32,14 @@ const createPhoto = async (req, res) => {
 
 const getAllPhotos = async (req, res) => {
   try {
-    const photos = await Photo.find({});
+    const photos = res.locals.user
+      ? await Photo.find({ user: { $ne: res.locals.user._id } })
+      : await Photo.find({});
+    res.status(200).render('photos', {
+      photos,
+      link: 'photos',
+    });
+
     res.status(200).render('photos', {
       photos,
       link: 'photos',
@@ -45,7 +52,7 @@ const getAllPhotos = async (req, res) => {
   }
 };
 
-const getPhoto = async (req, res) => {
+const getAPhoto = async (req, res) => {
   try {
     const photo = await Photo.findById({
       _id: req.params.id,
@@ -62,4 +69,4 @@ const getPhoto = async (req, res) => {
   }
 };
 
-export { createPhoto, getAllPhotos, getPhoto };
+export { createPhoto, getAllPhotos, getAPhoto };

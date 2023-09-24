@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import conn from './db.js';
 import cookieParser from 'cookie-parser';
+import methodOverride from 'method-override';
 // import { getAboutPage, getIndexPage } from './controllers/pageController.js';
 import pageRoute from './routes/pageRoute.js';
 import photoRoute from './routes/photoRoute.js';
@@ -34,6 +35,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(fileUpload({ useTempFiles: true }));
+app.use(
+  methodOverride('_method', {
+    methods: ['POST', 'GET'],
+  })
+);
 
 //Routes
 app.use('*', checkUser);

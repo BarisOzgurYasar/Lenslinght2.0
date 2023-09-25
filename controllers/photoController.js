@@ -10,7 +10,6 @@ const createPhoto = async (req, res) => {
       folder: 'lenslight_tr',
     }
   );
-
   try {
     await Photo.create({
       name: req.body.name,
@@ -63,6 +62,7 @@ const getAPhoto = async (req, res) => {
     });
   }
 };
+
 const deletePhoto = async (req, res) => {
   try {
     const photo = await Photo.findById(req.params.id);
@@ -79,6 +79,7 @@ const deletePhoto = async (req, res) => {
     });
   }
 };
+
 const updatePhoto = async (req, res) => {
   try {
     const photo = await Photo.findById(req.params.id);
